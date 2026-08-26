@@ -3,8 +3,35 @@ Matrix Synapse
 
 [Synapse](https://github.com/matrix-org/synapse) is the current reference implementation of the [Matrix protocol](https://matrix.org).
 
-For questions/help on the chart, feel free to drop in at [#matrix-on-kubernetes:fiksel.info](https://matrix.to/#/#matrix-on-kubernetes:fiksel.info).  
-This chart is hosted [on GitLab](https://gitlab.com/ananace/charts).
+> **This is an ITSH fork.** It is the `matrix-synapse` chart from
+> [gitlab.com/ananace/charts](https://gitlab.com/ananace/charts), extracted standalone, with
+> two changes: **Redis is only required when you run workers**, and **the bitnami
+> subcharts are removed**. See [FORK.md](./FORK.md) for the reasoning and for how to
+> re-sync with upstream.
+>
+> Upstream is Apache 2.0, Copyright 2021 Alexander Olofsson. For questions about the
+> original chart, upstream is the right place, not this fork:
+> [#matrix-on-kubernetes:fiksel.info](https://matrix.to/#/#matrix-on-kubernetes:fiksel.info).
+
+## Installing this fork
+
+Published to `ghcr.io/itsh-cloud/charts`, versioned `<upstream>-itsh.N`:
+
+```bash
+helm install synapse oci://ghcr.io/itsh-cloud/charts/matrix-synapse --version 3.12.36-itsh.1
+```
+
+There are **no chart dependencies**, so no `helm dependency build` is needed and nothing is
+fetched from a third-party chart repo at render time. Bring your own Postgres via
+`externalPostgresql`, and if you enable workers, your own Redis-compatible store via
+`externalRedis`.
+
+## Database and cache
+
+`postgresql.enabled` and `redis.enabled` no longer pull a subchart; those dependencies are
+gone. Configure `externalPostgresql` always, and `externalRedis` only when at least one
+worker is enabled. A 0-worker monolith needs no Redis at all, which is the point of the
+fork.
 
 __Attention:__ _The upgrade to 1.51.0 requires manual action, please read the upgrade instructions [below](#upgrading)._
 

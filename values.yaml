@@ -64,7 +64,8 @@ signingkey:
       pullPolicy: IfNotPresent
 
     publishImage:
-      repository: bitnami/kubectl
+      # ITSH FORK CHANGE: was bitnami/kubectl.
+      repository: registry.k8s.io/kubectl
       # tag: latest
       pullPolicy: IfNotPresent
 
@@ -787,7 +788,9 @@ wellknown:
 postgresql:
   enabled: true
   image:
-    repository: bitnamilegacy/postgresql
+    # ITSH FORK CHANGE: the bitnami postgresql subchart is removed from this
+    # fork, so this value is inert. Use externalPostgresql.
+    repository: ""
 
   auth:
     # XXX Change me!
@@ -844,7 +847,10 @@ externalPostgresql:
 redis:
   enabled: true
   image:
-    repository: bitnamilegacy/redis
+    # ITSH FORK CHANGE: the bitnami redis subchart is removed from this fork,
+    # so this value is inert. Redis is only needed with workers; use
+    # externalRedis then.
+    repository: ""
 
   ## Database ID for non-default database
   # dbid: 0

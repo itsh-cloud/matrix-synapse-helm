@@ -1,0 +1,87 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended"
+  ],
+  "platformAutomerge": true,
+  "osvVulnerabilityAlerts": true,
+  "vulnerabilityAlerts": {
+    "schedule": [
+      "at any time"
+    ],
+    "addLabels": [
+      "security"
+    ]
+  },
+  "customManagers": [
+    {
+      "description": "The Synapse version this chart targets, tracked from the upstream image.",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^Chart\\.yaml$/"
+      ],
+      "matchStrings": [
+        "appVersion: (?<currentValue>.+?)\\s"
+      ],
+      "depNameTemplate": "matrixdotorg/synapse",
+      "datasourceTemplate": "docker"
+    }
+  ],
+  "packageRules": [
+    {
+      "description": "Soak period before an update is eligible. Scoped by datasource on purpose: minimumReleaseAgeBehaviour defaults to timestamp-required, so an unqualified value would permanently withhold anything whose datasource reports no release timestamp. docker is excluded for that reason, since it reports one only for Docker Hub.",
+      "matchDatasources": [
+        "go",
+        "maven",
+        "pypi",
+        "crate",
+        "nuget",
+        "rubygems",
+        "packagist",
+        "hex",
+        "helm"
+      ],
+      "minimumReleaseAge": "3 days"
+    },
+    {
+      "matchDatasources": [
+        "npm"
+      ],
+      "minimumReleaseAge": "7 days"
+    },
+    {
+      "description": "This is a FORK. The chart version carries an -itsh.N suffix and is bumped by hand when rebasing onto a new upstream, never by a bot. See FORK.md.",
+      "matchFileNames": [
+        "Chart.yaml"
+      ],
+      "matchUpdateTypes": [
+        "major",
+        "minor",
+        "patch"
+      ],
+      "matchDepNames": [
+        "matrix-synapse"
+      ],
+      "enabled": false
+    },
+    {
+      "description": "Majors need a human.",
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "automerge": false,
+      "addLabels": [
+        "needs-review"
+      ]
+    },
+    {
+      "description": "Low-risk once CI is green. CI asserts both halves of the fork patch: a monolith renders no redis block, and worker mode still does.",
+      "matchUpdateTypes": [
+        "pin",
+        "pinDigest",
+        "patch"
+      ],
+      "automerge": true
+    }
+  ]
+}
