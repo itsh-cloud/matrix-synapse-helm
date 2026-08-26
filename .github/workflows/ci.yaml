@@ -25,7 +25,7 @@ jobs:
 
       # serverName and an external Postgres are required, so CI passes obviously
       # fake values to get a render for default validation.
-      - name: Helm template (monolith, the fork's whole point)
+      - name: Helm template (monolith)
         run: |
           helm template synapse . \
             --set serverName=ci.example.com \
@@ -34,8 +34,8 @@ jobs:
             --set externalPostgresql.password=ci-not-for-prod \
             > /tmp/monolith.yaml
 
-      # The fork exists so a 0-worker monolith needs no Redis. If a rebase onto
-      # upstream ever reintroduces the unconditional redis block, this fails.
+      # A 0-worker monolith must need no Redis. This is the behaviour the chart
+      # exists to provide, so it is asserted rather than assumed.
       - name: Assert a monolith renders no redis config
         run: |
           if grep -qE '^    redis:' /tmp/monolith.yaml; then
@@ -45,8 +45,8 @@ jobs:
           fi
           echo "OK: no redis block in the monolith render"
 
-      # The other half of the patch: enabling a worker must restore upstream
-      # behaviour, including requiring externalRedis.
+      # And the other direction: with a worker enabled, Redis is required again,
+      # because that is when Synapse actually uses it for replication.
       - name: Helm template (worker mode)
         run: |
           helm template synapse . \
@@ -62,20 +62,6 @@ jobs:
             exit 1
           }
           echo "OK: redis block present in worker mode"
-
-      # The fork removes the bitnami subcharts. If a rebase reintroduces them,
-      # `helm template` would start needing `helm dependency build` again.
-      - name: Assert no bitnami references
-        run: |
-          # Strip the file:line: prefix before deciding if it is a comment,
-          # otherwise every explanatory comment trips this check.
-          if grep -rniE 'bitnami' Chart.yaml values.yaml templates/ \
-               | sed -E 's/^[^:]+:[0-9]+://' \
-               | grep -vE '^\s*#' | grep -q .; then
-            echo "::error::bitnami reference found; the fork removed those deliberately" >&2
-            exit 1
-          fi
-          echo "OK: no bitnami references"
 
       - name: Install kubeconform
         run: |

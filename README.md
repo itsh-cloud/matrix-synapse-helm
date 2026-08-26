@@ -3,17 +3,11 @@ Matrix Synapse
 
 [Synapse](https://github.com/matrix-org/synapse) is the current reference implementation of the [Matrix protocol](https://matrix.org).
 
-> **This is an ITSH fork.** It is the `matrix-synapse` chart from
-> [gitlab.com/ananace/charts](https://gitlab.com/ananace/charts), extracted standalone, with
-> two changes: **Redis is only required when you run workers**, and **the bitnami
-> subcharts are removed**. See [FORK.md](./FORK.md) for the reasoning and for how to
-> re-sync with upstream.
->
-> Upstream is Apache 2.0, Copyright 2021 Alexander Olofsson. For questions about the
-> original chart, upstream is the right place, not this fork:
-> [#matrix-on-kubernetes:fiksel.info](https://matrix.to/#/#matrix-on-kubernetes:fiksel.info).
+> Originally derived from the `matrix-synapse` chart in
+> [gitlab.com/ananace/charts](https://gitlab.com/ananace/charts) (Apache 2.0, Copyright 2021
+> Alexander Olofsson) and modified. Maintained here on its own version line.
 
-## Installing this fork
+## Installing
 
 Published to `ghcr.io/itsh-cloud/charts` on its own version line, independent of the upstream
 chart version:
