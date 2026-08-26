@@ -45,6 +45,19 @@ jobs:
           fi
           echo "OK: no redis block in the monolith render"
 
+      # A monolith must not reference a redis Secret either. Gating the config
+      # block alone was not enough: the REDIS_PASSWORD env is gated separately,
+      # so the chart once rendered a secretKeyRef to a Secret nothing else
+      # needed, and deleting that Secret took three homeservers down with
+      # CreateContainerConfigError.
+      - name: Assert a monolith references no redis Secret
+        run: |
+          if grep -q 'name: REDIS_PASSWORD' /tmp/monolith.yaml; then
+            echo "::error::monolith render has a REDIS_PASSWORD secretKeyRef; it will reference a Secret that need not exist" >&2
+            exit 1
+          fi
+          echo "OK: no redis Secret reference in the monolith render"
+
       # And the other direction: with a worker enabled, Redis is required again,
       # because that is when Synapse actually uses it for replication.
       - name: Helm template (worker mode)

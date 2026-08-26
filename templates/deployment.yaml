@@ -100,7 +100,19 @@ spec:
                   key: {{ .Values.externalPostgresql.existingSecretPasswordKey }}
                   {{- end }}
           {{- end }}
-          {{- if or (and .Values.redis.enabled (default .Values.redis.usePassword true)) .Values.externalRedis.existingSecret }}
+          {{/*
+            ITSH FORK CHANGE: also gated on a worker being enabled, matching the
+            redis block in secrets.yaml. Without this the chart could render a
+            REDIS_PASSWORD secretKeyRef while rendering no redis config at all,
+            so the pod referenced a Secret nothing else needed. Deleting that
+            Secret then produced CreateContainerConfigError on a homeserver that
+            was not using Redis in the first place.
+          */}}
+          {{- $anyWorker := false }}
+          {{- range $worker, $config := .Values.workers }}
+            {{- if $config.enabled }}{{- $anyWorker = true }}{{- end }}
+          {{- end }}
+          {{- if and $anyWorker (or (and .Values.redis.enabled (default .Values.redis.usePassword true)) .Values.externalRedis.existingSecret) }}
             - name: REDIS_PASSWORD
               valueFrom:
                 secretKeyRef:
