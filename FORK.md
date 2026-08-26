@@ -4,7 +4,13 @@ This is the `matrix-synapse` chart from
 [gitlab.com/ananace/charts](https://gitlab.com/ananace/charts), extracted into a standalone
 repository and carrying two changes. Everything else is upstream.
 
-Base: **3.12.36** (appVersion 1.159.0). Our versions are tagged `3.12.36-itsh.N`.
+**This chart has its own version line.** It is published under our own name to our own
+registry, so it does not track the upstream chart version: it started at `1.0.0` and is
+bumped on our own cadence. `appVersion` still tracks Synapse.
+
+Based on upstream chart **3.12.36** (Synapse 1.159.0), upstream commit `2404244`. Record the
+new upstream commit here whenever you rebase; that, not the version number, is what says
+where the fork sits.
 
 Upstream is Apache 2.0, Copyright 2021 Alexander Olofsson. `LICENSE` is retained unchanged.
 Per Apache 2.0 §4(b), the modified files carry `ITSH FORK CHANGE` notices at each edit and
@@ -78,4 +84,5 @@ To pull a newer upstream chart, re-run that split, add it as a remote here, and 
 `ITSH FORK CHANGE` commits onto it. Both changes are small and localised, so conflicts should
 be limited to `templates/secrets.yaml`, `Chart.yaml` and `values.yaml`.
 
-Bump `version` to the new upstream version with an `-itsh.1` suffix when you do.
+Bump `version` on our own line when you do (a rebase onto a new upstream is at least a minor,
+since upstream changes are not ours to call patches), and update the base commit above.

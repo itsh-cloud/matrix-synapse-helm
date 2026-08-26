@@ -67,7 +67,11 @@ jobs:
       # `helm template` would start needing `helm dependency build` again.
       - name: Assert no bitnami references
         run: |
-          if grep -rniE 'bitnami' Chart.yaml values.yaml templates/ | grep -v 'ITSH FORK CHANGE' | grep -v '^\s*#'; then
+          # Strip the file:line: prefix before deciding if it is a comment,
+          # otherwise every explanatory comment trips this check.
+          if grep -rniE 'bitnami' Chart.yaml values.yaml templates/ \
+               | sed -E 's/^[^:]+:[0-9]+://' \
+               | grep -vE '^\s*#' | grep -q .; then
             echo "::error::bitnami reference found; the fork removed those deliberately" >&2
             exit 1
           fi

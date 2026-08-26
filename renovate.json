@@ -50,7 +50,7 @@
       "minimumReleaseAge": "7 days"
     },
     {
-      "description": "This is a FORK. The chart version carries an -itsh.N suffix and is bumped by hand when rebasing onto a new upstream, never by a bot. See FORK.md.",
+      "description": "This chart has its OWN version line, independent of upstream. It is bumped by hand when rebasing onto a new upstream, never by a bot. See FORK.md.",
       "matchFileNames": [
         "Chart.yaml"
       ],

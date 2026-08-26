@@ -15,10 +15,11 @@ Matrix Synapse
 
 ## Installing this fork
 
-Published to `ghcr.io/itsh-cloud/charts`, versioned `<upstream>-itsh.N`:
+Published to `ghcr.io/itsh-cloud/charts` on its own version line, independent of the upstream
+chart version:
 
 ```bash
-helm install synapse oci://ghcr.io/itsh-cloud/charts/matrix-synapse --version 3.12.36-itsh.1
+helm install synapse oci://ghcr.io/itsh-cloud/charts/matrix-synapse --version 1.0.0
 ```
 
 There are **no chart dependencies**, so no `helm dependency build` is needed and nothing is
