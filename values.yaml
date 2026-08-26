@@ -142,8 +142,18 @@ config:
   ##
   # enableRegistration: false
 
-  ## NB; this value will default to a random string if not specified.
+  ## NB; this value will default to a random string if not specified, and that
+  ## default is REGENERATED ON EVERY RENDER. Under a GitOps controller that
+  ## rolls the pods on unrelated commits and silently rotates the secret.
+  ## Prefer registrationSharedSecretExistingSecret below.
   # registrationSharedSecret: ''
+
+  ## ITSH FORK CHANGE: name of an existing Secret holding the registration
+  ## shared secret. When set, the rendered config carries a constant placeholder
+  ## and the real value is substituted at startup, so the render is
+  ## deterministic and the secret never enters git.
+  # registrationSharedSecretExistingSecret: ''
+  # registrationSharedSecretExistingSecretKey: registration-shared-secret
 
   ## NB; Strongly recommended to set this to a secure value.
   # macaroonSecretKey: ''

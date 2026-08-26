@@ -72,8 +72,11 @@ spec:
             - |
               export POSTGRES_PASSWORD=$(echo "${POSTGRES_PASSWORD:-}" | sed 's/\//\\\//g' | sed 's/\&/\\\&/g') && \
               export REDIS_PASSWORD=$(echo "${REDIS_PASSWORD:-}" | sed 's/\//\\\//g' | sed 's/\&/\\\&/g') && \
+              {{/* ITSH FORK CHANGE: same escaping as the two above, so a value containing / or & does not corrupt the sed. */}}
+              export REGISTRATION_SHARED_SECRET=$(echo "${REGISTRATION_SHARED_SECRET:-}" | sed 's/\//\\\//g' | sed 's/\&/\\\&/g') && \
               cat /synapse/secrets/*.yaml | \
                 sed -e "s/@@POSTGRES_PASSWORD@@/${POSTGRES_PASSWORD:-}/" \
+                    -e "s/@@REGISTRATION_SHARED_SECRET@@/${REGISTRATION_SHARED_SECRET:-}/" \
                     -e "s/@@REDIS_PASSWORD@@/${REDIS_PASSWORD:-}/" \
                        > /synapse/config/conf.d/secrets.yaml
 
@@ -108,6 +111,14 @@ spec:
             Secret then produced CreateContainerConfigError on a homeserver that
             was not using Redis in the first place.
           */}}
+          {{/* ITSH FORK CHANGE: see secrets.yaml. */}}
+          {{- with .Values.config.registrationSharedSecretExistingSecret }}
+            - name: REGISTRATION_SHARED_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ . }}
+                  key: {{ $.Values.config.registrationSharedSecretExistingSecretKey | default "registration-shared-secret" }}
+          {{- end }}
           {{- $anyWorker := false }}
           {{- range $worker, $config := .Values.workers }}
             {{- if $config.enabled }}{{- $anyWorker = true }}{{- end }}

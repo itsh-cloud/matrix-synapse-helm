@@ -76,6 +76,28 @@ jobs:
           }
           echo "OK: redis block present in worker mode"
 
+      # The render MUST be byte-identical across runs. Upstream defaulted
+      # registration_shared_secret to randAlphaNum, so every render differed:
+      # under a GitOps controller that rolled the pods on unrelated commits and
+      # silently rotated the secret on every sync.
+      - name: Assert the render is deterministic
+        run: |
+          for i in 1 2; do
+            helm template synapse . \
+              --set serverName=ci.example.com \
+              --set externalPostgresql.host=pg.invalid \
+              --set externalPostgresql.username=ci \
+              --set externalPostgresql.password=ci-not-for-prod \
+              --set config.registrationSharedSecretExistingSecret=ci-reg \
+              | sha256sum | cut -d' ' -f1 >> /tmp/hashes
+          done
+          if [ "$(sort -u /tmp/hashes | wc -l)" != "1" ]; then
+            echo "::error::render is not deterministic; something regenerates on each render" >&2
+            cat /tmp/hashes >&2
+            exit 1
+          fi
+          echo "OK: render is deterministic"
+
       - name: Install kubeconform
         run: |
           curl -sL https://github.com/yannh/kubeconform/releases/latest/download/kubeconform-linux-amd64.tar.gz | tar xz
